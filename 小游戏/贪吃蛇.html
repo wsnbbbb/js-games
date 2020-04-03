@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #mygame {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            border: 1px solid black
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="mygame" width="600" height="600"></canvas>
+    <script>
+        class snakegame {
+            constructor(mygame, snakehang, snakelie) {
+                this.ctx = mygame.getContext('2d');
+                this.snakehang = snakehang;
+                this.snakelie = snakelie;
+                this.mygameWidth = mygame.width;
+                this.mygameHeight = mygame.height;
+                this.snakeboxwidth = this.mygameWidth / this.snakelie;
+                this.snakeboxheight = this.mygameHeight / this.snakehang;
+                // console.log(this.snakeboxwidth, this.snakeboxheight)
+               this.settime1=null;
+                this.snakearr=[
+                    {x:100,y:100},
+                    {x:100,y:120},
+                    {x:100,y:140},
+                    {x:100,y:160},
+                    {x:100,y:180}
+                ]
+               
+                this.snakeHead={}
+                this.direction='right';
+                this.dowx=20;
+                this.dowy=0;
+                this.foodx=null;
+                this.foody=null
+            }
+            //设置地图
+            setMap() {
+                this.ctx.strokeStyle = 'red';
+                for (let i = 1; i < this.snakehang; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, i*this.snakeboxheight);
+                    this.ctx.lineTo(this.mygameWidth, i*this.snakeboxheight);
+                    this.ctx.stroke()
+                }
+                for (let i = 1; i < this.snakelie; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(i*this.snakeboxwidth, 0);
+                    this.ctx.lineTo(i*this.snakeboxheight, this.mygameHeight);
+                    this.ctx.stroke()
+                }
+
+            }
+            //画蛇
+            setsnake(){
+                for( let i=0;i<this.snakearr.length;i++){
+                 if(i==this.snakearr.length-1){
+                    this.ctx.fillStyle='green';
+                    this.snakeHead=this.snakearr[i]
+                }else{
+                    this.ctx.fillStyle='blue';
+                }
+                   this.ctx.fillRect(this.snakearr[i].x+1,this.snakearr[i].y+1,this.snakeboxwidth-2,this.snakeboxheight-2);
+                }
+            }
+            //开始游戏
+            init() {
+                this.setMap();
+                this.setsnake();
+                this.settime();
+                this.changeDirection();
+                this.food() 
+            }
+            //边界判定
+            jugedeg(x,y){
+                if(x<0||x>this.mygameWidth-this.snakeboxwidth||y<0||y>this.mygameHeight-this.snakeboxheight){
+                    return false
+                }else{
+                    for(let i=0;i<this.snakearr.length;i++){
+                        if(x==this.snakearr[i].x&&y==this.snakearr[i].y){
+                           return flase 
+                        }
+                    }
+                    return true
+                }
+            }
+            //让蛇进行移动
+            settime(){
+            var that=this;
+            this.settime1=setInterval(function(){
+             var snakedom={
+                 x:that.snakeHead.x+that.dowx,
+                 y:that.snakeHead.y+that.dowy
+             }
+             if(that.jugedeg(snakedom.x,snakedom.y)){
+             that.clearRect();
+             if(that.eatFood(that.snakeHead.x,that.snakeHead.y)){
+                that.food()
+             }else{
+                that.snakearr.splice(0,1);
+             }
+             that.snakearr.push(snakedom);
+             that.setsnake()
+             
+             }
+              },200)
+            } 
+
+        //吃食物
+        eatFood(x,y){
+        if(x==this.foodx&&y==this.foody){
+            return true 
+        }else{
+            return false
+            alert('游戏结束')
+        }
+        }
+
+        //食物投放
+        food(){
+            var foox=parseInt(Math.random()*(30))*this.snakeboxwidth;
+            var fooy=parseInt(Math.random()*(30))*this.snakeboxheight
+            for(let i=0;i<this.snakearr.length;i++){
+             if(foox==this.snakearr[i].x&&fooy==this.snakearr[i].y){
+                 this.food()
+             }
+            }
+            this.ctx.fillRect(foox+1,fooy+1,this.snakeboxwidth-2,this.snakeboxheight-2)
+            this.foodx=foox;
+            this.foody=fooy;
+        }
+      
+        //上下左右
+        changeDirection(){
+            var that=this;
+            window.onkeydown=function(e){
+            console.log(e.keyCode)
+            if(e.keyCode==37&&that.direction!='right'){
+                that.dowx=-20;
+                that.dowy=0;
+                that.direction='left'
+            }else if(e.keyCode==38&&that.direction!='down'){
+                that.dowx=0;
+                that.dowy=-20; 
+                that.direction='up'
+            }else if(e.keyCode==39&&that.direction!='left'){
+                that.dowy=0;
+                that.dowx=20;
+                that.direction='right'
+            }else if(e.keyCode==40&&that.direction!='up'){
+                that.dowy=20;
+                that.dowx=0;
+                that.direction='down'
+            }
+            }
+        }
+
+            //清除原来蛇的方块
+            clearRect(){
+                for(let i=0;i<this.snakearr.length;i++){
+                    this.ctx.clearRect(this.snakearr[i].x+1,this.snakearr[i].y+1,this.snakeboxwidth-2,this.snakeboxheight-2)
+                }
+            }
+            //结束游戏
+            stop() {
+
+            }
+        }
+        var mygame = document.getElementById('mygame')
+        var newgame = new snakegame(mygame, 30, 30)
+        newgame.init()
+    </script>
+</body>
+
+</html>

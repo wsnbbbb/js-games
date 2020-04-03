@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+        .box {
+            width: 800px;
+            height: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .gamebox {
+            width: 500px;
+            height: 500px;
+            background-color:black;
+            font-size: 0px;
+            float: left;
+        }
+
+        .leftbox {
+            width: 300px;
+            height: 500px;
+            position: relative;
+            background-color:black;
+            float: left;
+            background-image: url("img/22.png");
+        }
+
+        .leftboxneibu {
+            width: 220px;
+            height: 420px;
+            background-image: url("img/1.png");
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+        }
+
+        .start {
+            width: 100px;
+            height: 50px;
+            margin-left: 50px;
+            position: absolute;
+            top: 520px;
+            left: 480px;
+        }
+
+        .stop {
+            width: 100px;
+            height: 50px;
+            margin-left: 250px;
+            position: absolute;
+            top: 520px;
+            left: 480px;
+        }
+
+        .null {
+            position: relative;
+            width: 1px;
+        }
+        .dengji{
+            width: 40px;
+            height: 40px;
+            margin-top: 15px;
+            margin-left: 25px;
+            background-image: url("img/6.png");
+            background-size: 100% 100%;
+            background-repeat : no-repeat;
+        }
+        .dengji1{
+            font-size: 30px;
+            color: white;
+            position: absolute;
+            left: 100px;
+            top: 15px;
+        }
+        .gjl{
+            font-size: 20px;
+            color: white;
+            margin-left:15px;
+            margin-top: 15px;
+        }
+        .gjlvalue{
+            margin-left:40px;
+        }
+        .key{
+            display: block;
+            width: 40px;
+            margin-top: 10px;
+            margin-left: 30px;
+        }
+        .keyvalue{
+            position: absolute;
+            left: 130px;
+            margin-top: -43px;
+            font-size: 30px;
+            color: white;
+        }
+        .fengmian{
+           color:white;
+           font-size: 80px;
+           position: absolute;
+           top: 150px;
+           left: 150px;
+        }
+    </style>
+
+    <button onclick="newgame.init()" class="start">开始游戏</button>
+    <button onclick="newgame.stop()" class="stop">结束游戏</button>
+    <div class="box">
+        <div class="leftbox">
+            <div class="leftboxneibu">
+                <div class="dengji"></div>
+                <span class="dengji1">1 级</span>
+                <p class="gjl">攻击力<span class="gjlvalue">0</span></p>
+                <p class="gjl">防御力<span class="gjlvalue">0</span></p>
+                <p class="gjl">生命值<span class="gjlvalue">100</span></p>
+                <p class="gjl">金币<span class="gjlvalue">0</span></p>
+                <p class="gjl">楼层<span class="gjlvalue">1</span>  层</p>
+                <img src="img/9.png" class="key"><p class="keyvalue">0</p>
+                <img src="img/25.png" class="key"><p class="keyvalue">0</p>
+                <img src="img/26.png" class="key"><p class="keyvalue">0</p>
+            </div>
+        </div>
+        <div class="gamebox"></div>
+        <p class="fengmian">点击开始游戏</p>
+    </div>
+    <script>
+         var leftbox=document.querySelector(".leftbox")
+                leftbox.style.backgroundImage="none"
+        var leftboxneibu=document.querySelector(".leftboxneibu")
+              leftboxneibu.style.display="none"
+        var fengmian=document.querySelector(".fengmian")
+        var gjlvalue=document.querySelectorAll(".gjlvalue")[0]
+        var fylvalue=document.querySelectorAll(".gjlvalue")[1]
+        var moneyvalue=document.querySelectorAll(".gjlvalue")[3]
+        var loucengvalue=document.querySelectorAll(".gjlvalue")[4]
+        var key1=document.querySelectorAll(".keyvalue")[0]
+        var key2=document.querySelectorAll(".keyvalue")[1]
+        var key3=document.querySelectorAll(".keyvalue")[2]
+
+        class game {
+            constructor(map, gamebox) {
+                this.gamebox = gamebox
+                this.gametype = false
+                this.num = 0
+                this.mapall = map
+                this.map = this.mapall[this.num]
+                this.heroobj = {
+                    hp: 100,
+                    mp: 100,
+                    attack: 100,
+                    defence: 100,
+                    money: 0
+                }
+                this.monsterobj = {
+                    hp: 50,
+                    mp: 50,
+                    attack: 50,
+                    defence: 50
+                }
+                this.yellowkey = 0
+                this.redkey = 0
+                this.bluekey = 0
+            }
+            //游戏开始
+            init() {
+                this.gametype = true
+                this.drawmap()
+                this.move1()
+            }
+            //绘制地图
+                drawmap() {
+                gjlvalue.innerHTML=this.heroobj.attack
+                fylvalue.innerHTML=this.heroobj.defence
+                moneyvalue.innerHTML=this.heroobj.money
+                loucengvalue.innerHTML=this.num+1
+                key1.innerHTML=this.yellowkey
+                key2.innerHTML=this.redkey
+                key3.innerHTML=this.bluekey
+                fengmian.innerHTML=""
+                leftbox.style.backgroundImage= 'url("img/22.png")'
+                leftboxneibu.style.display="block"
+                this.gamebox.innerHTML = ""
+                for (let i = 0; i < this.map.length; i++) {
+                    for (let j = 0; j < this.map[i].length; j++) {
+                        // console.log(this.map[i][j])
+                        var dom = document.createElement("div");
+
+                        var gamewidth = this.gamebox.offsetWidth;
+                        var gameheight = this.gamebox.offsetHeight;
+
+                        var domwidth = gamewidth / this.map[i].length;
+                        var domheight = gameheight / this.map.length;
+                        dom.style.width = domwidth + "px";
+                        dom.style.height = domheight + "px";
+                        if (this.map[i][j] == 0) {
+                            dom.style.backgroundImage = "url(img/1.png)";
+                        } else if (this.map[i][j] == 1) {
+                            dom.style.backgroundImage = "url(img/2.png)";
+                        } else if (this.map[i][j] == 2) {
+                            dom.style.backgroundImage = "url(img/7.png)";
+                        } else if (this.map[i][j] == 3) {
+                            dom.style.backgroundImage = "url(img/11.png)";
+                        } else if (this.map[i][j] == 4) {
+                            dom.style.backgroundImage = "url(img/4.png)";
+                        } else if (this.map[i][j] == 5) {
+                            dom.style.backgroundImage = "url(img/9.png)";
+                        } else if (this.map[i][j] == 6) {
+                            dom.style.backgroundImage = "url(img/12.png)";
+                        } else if (this.map[i][j] == 7) {
+                            dom.style.backgroundImage = "url(img/6.png)";
+                        } else if (this.map[i][j] == 8) {
+                            dom.style.backgroundImage = "url(img/13.png)";
+                        } else if (this.map[i][j] == 9) {
+                            dom.style.backgroundImage = "url(img/14.png)";
+                        } else if (this.map[i][j] == 10) {
+                            dom.style.backgroundImage = "url(img/15.png)";
+                        } else if (this.map[i][j] == 11) {
+                            dom.style.backgroundImage = "url(img/16.png)";
+                        } else if (this.map[i][j] == 12) {
+                            dom.style.backgroundImage = "url(img/17.png)";
+                        } else if (this.map[i][j] == 13) {
+                            dom.style.backgroundImage = "url(img/18.png)";
+                        } else if (this.map[i][j] == 14) {
+                            dom.style.backgroundImage = "url(img/19.png)";
+                        } else if (this.map[i][j] == 15) {
+                            dom.style.backgroundImage = "url(img/20.png)";
+                        } else if (this.map[i][j] == 16) {
+                            dom.style.backgroundImage = "url(img/21.png)";
+                        } else if (this.map[i][j] == 17) {
+                            dom.style.backgroundImage = "url(img/8.png)";
+                        } else if (this.map[i][j] == 18) {
+                            dom.style.backgroundImage = "url(img/22.png)";
+                        } else if (this.map[i][j] == 19) {
+                            dom.style.backgroundImage = "url(img/23.png)";
+                        } else if (this.map[i][j] == 20) {
+                            dom.style.backgroundImage = "url(img/25.png)";
+                        } else if (this.map[i][j] == 21) {
+                            dom.style.backgroundImage = "url(img/26.png)";
+                        } else if (this.map[i][j] == 22) {
+                            dom.style.backgroundImage = "url(img/24.png)";
+                        } else if (this.map[i][j] == 23) {
+                            dom.style.backgroundImage = "url(img/27.png)";
+                        } else if (this.map[i][j] == 24) {
+                            dom.style.backgroundImage = "url(img/28.png)";
+                        } else if (this.map[i][j] == 25) {
+                            dom.style.backgroundImage = "url(img/29.png)";
+                        } else if (this.map[i][j] == 26) {
+                            dom.style.backgroundImage = "url(img/30.png)";
+                        } else if (this.map[i][j] == 27) {
+                            dom.style.backgroundImage = "url(img/31.png)";
+                        } else if (this.map[i][j] == 28) {
+                            dom.style.backgroundImage = "url(img/32.png)";
+                        } else if (this.map[i][j] == 29) {
+                            dom.style.backgroundImage = "url(img/33.png)";
+                        } else if (this.map[i][j] == 30) {
+                            dom.style.backgroundImage = "url(img/34.png)";
+                        } else if (this.map[i][j] == 31) {
+                            dom.style.backgroundImage = "url(img/35.png)";
+                        } else if (this.map[i][j] == 32) {
+                            dom.style.backgroundImage = "url(img/36.png)";
+                        } else if (this.map[i][j] == 33) {
+                            dom.style.backgroundImage = "url(img/37.png)";
+                        } else if (this.map[i][j] == 34) {
+                            dom.style.backgroundImage = "url(img/38.png)";
+                        } else if (this.map[i][j] == 35) {
+                            dom.style.backgroundImage = "url(img/39.png)";
+                        } else if (this.map[i][j] == 36) {
+                            dom.style.backgroundImage = "url(img/40.png)";
+                        } else if (this.map[i][j] == 37) {
+                            dom.style.backgroundImage = "url(img/41.png)";
+                        } else if (this.map[i][j] == 38) {
+                            dom.style.backgroundImage = "url(img/42.png)";
+                        } else if (this.map[i][j] == 39) {
+                            dom.style.backgroundImage = "url(img/46.png)";
+                        } else if (this.map[i][j] == 40) {
+                            dom.style.backgroundImage = "url(img/44.png)";
+                        } else if (this.map[i][j] == 41) {
+                            dom.style.backgroundImage = "url(img/45.png)";
+                        } else if (this.map[i][j] == 42) {
+                            dom.style.backgroundImage = "url(img/43.png)";
+                        } else if (this.map[i][j] == 43) {
+                            dom.style.backgroundImage = "url(img/47.png)";
+                        } else if (this.map[i][j] == 44) {
+                            dom.style.backgroundImage = "url(img/48.png)";
+                        } else if (this.map[i][j] == 45) {
+                            dom.style.backgroundImage = "url(img/49.png)";
+                        }
+                        dom.style.backgroundSize = "100% 100%";
+                        dom.style.backgrounfRepeat = "no-repeat";
+                        dom.style.display = "inline-block"
+                        this.gamebox.appendChild(dom)
+                    }
+                }
+
+            }
+            //获取英雄位置
+            getheroposition() {
+                for (let i = 0; i < this.map.length; i++) {
+                    for (let j = 0; j < this.map[i].length; j++) {
+                        if (this.map[i][j] == 7) {
+                            return [j, i]
+                        }
+                    }
+                }
+            }
+            //移动
+            move(x, y, nextx, nexty) {
+                if (this.bianjie(nextx, nexty) && this.meetall(nextx, nexty)) {
+                    var newvalue = this.map[y][x];
+                    this.map[y][x] = this.map[nexty][nextx];
+                    this.map[nexty][nextx] = newvalue
+                    this.drawmap()
+                }
+            }
+            //边界判定
+            bianjie(nextx, nexty) {
+                var maparray = this.map
+                console.log(maparray)
+                if (nexty < 0 || nexty > maparray.length - 1 || maparray[nexty][nextx] == null || maparray[nexty][
+                        nextx
+                    ] == undefined) {
+                    return false
+                } else {
+                    return true
+                }
+            }
+            //小怪攻击力判定
+            meetmonster(nextx, nexty) {
+                if (this.heroobj.attack > this.monsterobj.defence) {
+                    return true
+                } else {
+                    alert("啊我死了~充钱复活！穷人止步！")
+                    window.location.reload()
+                    return false
+                }
+            }
+
+
+
+            //遇到怪物、药水、门、钥匙。。。。
+            meetall(nextx, nexty) {
+                //遇到墙
+                if (this.map[nexty][nextx] == 1) {
+                    return false
+                } else if (this.map[nexty][nextx] == 18) {
+                    return false
+                }
+                //遇到小怪
+                else if (this.map[nexty][nextx] == 8) {
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                    //遇到大骷髅怪
+                } else if(this.map[nexty][nextx] == 12){
+                    this.monsterobj.defence = 100
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                }//遇到黄门
+                 else if (this.map[nexty][nextx] == 4) {
+                    if (this.yellowkey > 0) {
+                        this.map[nexty][nextx] = 0
+                        this.yellowkey -= 1
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到黄钥匙
+                else if (this.map[nexty][nextx] == 5) {
+                    this.map[nexty][nextx] = 0
+                    this.yellowkey += 1
+                    return true
+                    //遇到魔杖
+                } else if (this.map[nexty][nextx] == 13) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.attack += 200
+                    alert("恭喜你拾得法宝巫师法杖，攻击力+200")
+                    return true
+                    //遇到血瓶
+                }  else if (this.map[nexty][nextx] == 3) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.attack += 20
+                    return true
+                    //遇到蝙蝠   
+                } else if (this.map[nexty][nextx] == 10) {
+                    this.monsterobj.defence = 150
+                    this.monsterobj.attack = 150
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                    //遇到蓝瓶
+                } else if (this.map[nexty][nextx] == 15) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.defence += 50
+                    return true
+                }
+                //遇到绿色小怪
+                else if (this.map[nexty][nextx] == 14) {
+                    this.monsterobj.defence = 180
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                    //遇到红宝石    
+                } else if (this.map[nexty][nextx] == 6) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.money += 500
+                    return true
+                }
+                //遇到巫师
+                else if (this.map[nexty][nextx] == 11) {
+                    this.monsterobj.defence = 200
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                    //遇到蓝宝石
+                } else if (this.map[nexty][nextx] == 9) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.money += 300
+                    return true
+                    //遇到红色小怪
+                } else if (this.map[nexty][nextx] == 16) {
+                    this.monsterobj.defence = 200
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                    //上楼
+                } else if (this.map[nexty][nextx] == 2) {
+                    this.num++;
+                    this.map = this.mapall[this.num]
+                    this.init()
+                    //下楼
+                } else if (this.map[nexty][nextx] == 17) {
+                    this.num--;
+                    this.map = this.mapall[this.num]
+                    this.init()
+                    //遇到红卫兵
+                } else if (this.map[nexty][nextx] == 19) {
+                    this.monsterobj.defence = 300
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                    //遇到黄卫兵    
+                } else if (this.map[nexty][nextx] == 22) {
+                    this.monsterobj.defence = 250
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到铁门
+                else if (this.map[nexty][nextx] == 24) {
+                    this.monsterobj.defence = 250
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到红钥匙
+                else if (this.map[nexty][nextx] == 20) {
+                    this.map[nexty][nextx] = 0
+                    this.redkey += 1
+                    return true
+                }
+                //遇到红门
+                else if (this.map[nexty][nextx] == 28) {
+                    if (this.redkey > 0) {
+                        this.map[nexty][nextx] = 0
+                        this.redkey -= 1
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到蓝钥匙
+                else if (this.map[nexty][nextx] == 21) {
+                    this.map[nexty][nextx] = 0
+                    this.bluekey += 1
+                    return true
+                }
+                //遇到蓝门
+                else if (this.map[nexty][nextx] == 23) {
+                    if (this.bluekey > 0) {
+                        this.map[nexty][nextx] = 0
+                        this.bluekey -= 1
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到老爷爷
+                else if (this.map[nexty][nextx] == 25) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.attack += 100
+                    this.heroobj.money += 300
+                    alert("成功解救留守老人")
+                    return true
+                }
+                //遇到老奶奶
+                else if (this.map[nexty][nextx] == 26) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.attack += 100
+                    this.heroobj.money += 300
+                    alert("老奶奶：你可真是带善人，为报救命之恩我愿以身相许(点击确定即可拒绝)")
+                    alert("拒绝失败，恭喜勇士原地结婚，收获彩礼300金币")
+                    return true
+                }
+                //遇到长剑
+                else if (this.map[nexty][nextx] == 29) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.attack += 100
+                    return true
+                }
+                //遇到第三层boss
+                else if (this.map[nexty][nextx] == 30 || this.map[nexty][nextx] == 31 || this.map[nexty][nextx] ==
+                    32) {
+                    this.monsterobj.defence = 500
+                    alert("你好，你能打死我我给你500，打不死我你就拉闸 给爷爬")
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到小黑球
+                else if (this.map[nexty][nextx] == 33) {
+                    this.monsterobj.defence = 250
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到人质
+                else if (this.map[nexty][nextx] == 34) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.attack += 200
+                    this.heroobj.money += 300
+                    alert("成功解救一名斯巴达人")
+                    return true
+                }
+                //遇到大蝙蝠
+                else if (this.map[nexty][nextx] == 35) {
+                    this.monsterobj.defence = 280
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到红蝙蝠
+                else if (this.map[nexty][nextx] == 36) {
+                    this.monsterobj.defence = 350
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到狮子
+                else if (this.map[nexty][nextx] == 37) {
+                    this.monsterobj.defence = 300
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到狮子王
+                else if (this.map[nexty][nextx] == 38) {
+                    this.monsterobj.defence = 400
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                } //黑头娃
+                else if (this.map[nexty][nextx] == 41) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.attack += 200
+                    this.heroobj.money += 300
+                    alert("成功解救一名黑头娃")
+                    return true
+                }
+                //遇到吸血书
+                else if (this.map[nexty][nextx] == 42) {
+                    this.map[nexty][nextx] = 0
+                    this.heroobj.attack += 200
+                    this.heroobj.money += 300
+                    alert("拾得吸血书一本")
+                    return true
+                }
+                //遇到蜡烛和红墙
+                else if (this.map[nexty][nextx] == 40 || this.map[nexty][nextx] == 45) {
+                    return false
+
+                }
+                //遇到黑国王
+                else if (this.map[nexty][nextx] == 43) {
+                    this.monsterobj.defence = 1000
+                    alert("遇到国王，你可能打不过哦")
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                //遇到黑卫兵
+                else if (this.map[nexty][nextx] == 44) {
+                    this.monsterobj.defence = 500
+                    alert("黑卫兵：来者何人")
+                    if (this.meetmonster(nextx, nexty)) {
+                        this.map[nexty][nextx] = 0
+                        return true
+                    } else {
+                        return false
+                    }
+                } else {
+                    return true
+                }
+            }
+
+            move1() {
+                console.log(this.gametype)
+                window.onkeydown = function (e) {
+                    if (this.gametype) {
+                        console.log("游戏开始")
+                        var heroposition = this.getheroposition();
+                        console.log(heroposition)
+                        console.log(e.keyCode)
+                        var herox = heroposition[0];
+                        console.log(herox)
+                        var heroy = heroposition[1];
+                        var nextherox = herox;
+                        var nextheroy = heroy;
+                        if (e.keyCode == 37) {
+                            // console.log("向左")
+                            nextherox = herox - 1;
+                            //  nextheroy = heroy;
+                            this.move(herox, heroy, nextherox, nextheroy)
+                        }
+                        if (e.keyCode == 38) {
+                            // console.log("向上")
+                            //  nextherox = herox;
+                            nextheroy = heroy - 1;
+                            this.move(herox, heroy, nextherox, nextheroy)
+                        }
+                        if (e.keyCode == 39) {
+                            // console.log("向右")
+                            nextherox = herox + 1;
+                            //  nextheroy = heroy;
+                            this.move(herox, heroy, nextherox, nextheroy)
+                        }
+                        if (e.keyCode == 40) {
+                            // console.log("向下")
+                            //  nextherox = herox;
+                            nextheroy = heroy + 1;
+                            this.move(herox, heroy, nextherox, nextheroy)
+                        }
+                    } else {
+                        console.log("游戏没开始")
+                    }
+                }.bind(this)
+            }
+            stop() {
+                this.gametype = false
+                alert("确定要退出游戏吗")
+                window.location.reload()
+            }
+
+        }
+        var twoarray = [
+            [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18],
+            [18, 2, 0, 14, 16, 14, 5, 0, 0, 5, 0, 0, 18],
+            [18, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 18],
+            [18, 3, 0, 0, 4, 0, 1, 6, 5, 0, 1, 0, 18],
+            [18, 0, 8, 0, 1, 0, 1, 9, 3, 0, 1, 0, 18],
+            [18, 1, 4, 1, 1, 0, 1, 1, 1, 4, 1, 0, 18],
+            [18, 5, 0, 0, 1, 0, 4, 10, 11, 10, 1, 0, 18],
+            [18, 0, 12, 0, 1, 0, 1, 1, 1, 1, 1, 0, 18],
+            [18, 1, 4, 1, 1, 0, 5, 0, 0, 0, 0, 0, 18],
+            [18, 0, 0, 0, 1, 1, 28, 1, 1, 1, 4, 1, 18],
+            [18, 3, 0, 5, 1, 20, 0, 0, 1, 0, 10, 21, 18],
+            [18, 3, 13, 5, 0, 0, 7, 0, 1, 14, 15, 14, 18],
+            [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18]
+        ]
+
+        var twoarray1 = [
+            [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18],
+            [18, 17, 1, 0, 19, 0, 1, 6, 9, 5, 20, 1, 18],
+            [18, 7, 1, 6, 1, 15, 1, 6, 9, 5, 21, 1, 18],
+            [18, 0, 1, 5, 1, 5, 1, 6, 9, 5, 22, 1, 18],
+            [18, 0, 1, 5, 1, 5, 1, 1, 1, 1, 4, 1, 18],
+            [18, 0, 1, 0, 1, 0, 0, 0, 4, 0, 0, 1, 18],
+            [18, 0, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 18],
+            [18, 0, 23, 0, 0, 0, 0, 1, 0, 22, 0, 1, 18],
+            [18, 0, 1, 4, 1, 1, 23, 1, 24, 1, 24, 1, 18],
+            [18, 0, 1, 5, 1, 15, 3, 1, 0, 1, 0, 1, 18],
+            [18, 0, 1, 5, 1, 15, 3, 1, 0, 1, 0, 1, 18],
+            [18, 2, 1, 6, 1, 15, 3, 1, 25, 1, 26, 1, 18],
+            [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18]
+        ]
+        var twoarray2 = [
+            [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18],
+            [18, 29, 16, 5, 1, 30, 31, 32, 1, 1, 1, 1, 18],
+            [18, 16, 5, 0, 1, 0, 0, 0, 1, 0, 10, 0, 18],
+            [18, 5, 8, 0, 1, 1, 4, 1, 1, 0, 1, 0, 18],
+            [18, 1, 4, 1, 1, 0, 8, 0, 1, 5, 1, 16, 18],
+            [18, 0, 0, 0, 1, 1, 1, 0, 1, 5, 1, 10, 18],
+            [18, 14, 1, 0, 10, 16, 10, 0, 1, 5, 1, 16, 18],
+            [18, 14, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 18],
+            [18, 0, 0, 0, 0, 0, 1, 1, 4, 1, 1, 0, 18],
+            [18, 1, 1, 1, 1, 10, 1, 16, 0, 16, 1, 0, 18],
+            [18, 1, 0, 0, 0, 0, 1, 6, 10, 5, 1, 0, 18],
+            [18, 17, 7, 1, 1, 1, 1, 9, 15, 5, 1, 2, 18],
+            [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18]
+        ]
+
+        var twoarray3 = [
+            [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18],
+            [18, 0, 33, 0, 1, 0, 34, 0, 1, 0, 33, 0, 18],
+            [18, 4, 1, 4, 1, 0, 0, 0, 1, 4, 1, 4, 18],
+            [18, 0, 1, 0, 1, 1, 24, 1, 1, 0, 1, 0, 18],
+            [18, 0, 1, 8, 1, 35, 36, 35, 1, 8, 1, 0, 18],
+            [18, 10, 1, 3, 1, 6, 35, 6, 1, 3, 1, 10, 18],
+            [18, 10, 1, 3, 1, 1, 28, 1, 1, 3, 1, 10, 18],
+            [18, 16, 1, 0, 1, 37, 38, 37, 1, 0, 1, 16, 18],
+            [18, 0, 1, 0, 1, 9, 37, 9, 1, 0, 1, 0, 18],
+            [18, 0, 1, 0, 1, 1, 23, 1, 1, 0, 1, 0, 18],
+            [18, 0, 1, 0, 1, 5, 0, 5, 1, 0, 1, 7, 18],
+            [18, 2, 1, 0, 33, 0, 0, 0, 0, 33, 0, 17, 18],
+            [18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18]
+
+        ]
+
+        var twoarray4 = [
+            [39, 39, 39, 39, 1, 1, 1, 1, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 0, 2, 0, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 40, 42, 40, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 5, 20, 5, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 3, 0, 3, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 40, 13, 40, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 41, 0, 41, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 1, 6, 1, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 40, 3, 40, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 25, 9, 25, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 1, 7, 1, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 40, 17, 40, 1, 39, 39, 39, 39],
+            [39, 39, 39, 39, 1, 1, 1, 1, 1, 39, 39, 39, 39]
+        ]
+
+        var twoarray5 = [
+            [45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45],
+            [45, 45, 45, 45, 45, 45, 2, 45, 45, 45, 45, 45, 45],
+            [45, 45, 45, 45, 44, 44, 43, 44, 44, 45, 45, 45, 45],
+            [45, 45, 45, 45, 44, 44, 44, 44, 44, 45, 45, 45, 45],
+            [45, 45, 45, 45, 45, 45, 16, 45, 45, 45, 45, 45, 45],
+            [45, 45, 45, 45, 11, 11, 11, 11, 11, 45, 45, 45, 45],
+            [45, 45, 45, 45, 45, 33, 33, 33, 45, 45, 45, 45, 45],
+            [45, 22, 19, 22, 19, 22, 19, 22, 19, 22, 19, 22, 45],
+            [45, 45, 45, 45, 45, 45, 35, 45, 45, 45, 45, 45, 45],
+            [45, 45, 45, 45, 36, 38, 36, 38, 36, 45, 45, 45, 45],
+            [45, 45, 45, 45, 45, 45, 37, 45, 45, 45, 45, 45, 45],
+            [45, 45, 45, 45, 45, 40, 7, 40, 45, 45, 45, 45, 45],
+            [45, 45, 45, 45, 45, 45, 17, 45, 45, 45, 45, 45]
+        ]
+        var arrayall = [twoarray, twoarray1, twoarray2, twoarray3, twoarray4, twoarray5]
+        var gamebox = document.getElementsByClassName('gamebox')[0]
+        let newgame = new game(arrayall, gamebox);
+    </script>
+</body>
+
+</html>
